@@ -1,0 +1,88 @@
+- name: ethotracker
+  label: Ethotracker (position)
+  type: stacked
+  default: "no"
+  options: yes,no
+
+  "no":
+
+  "yes":
+    - name: ethotracker.processor
+      label: ethotracker profile  (centroid tracking)
+      type: list
+      default: chaining_coarse
+      options: chaining,playback,playback_red,playback_fix,chaining_hires,chaining_coarse
+      help: HELP!!
+    - name: ethotracker.threshold
+      label: ethotracker threshold (centroid tracking)
+      type: float
+      default: 0.2
+      range: 0,1
+
+- name: deepposekit
+  label: Deepposekit (pose)
+  type: stacked
+  default: "no"
+  options: yes,no
+
+  "no":
+
+  "yes":
+    - name: deepposekit.modelname
+      label: deepposekit model name (pose tracking)
+      type: file_open
+      default: /Volumes/ukme04/#Common/snakemake-workflows/*
+
+- name: sleap
+  label: Sleap (position and pose)
+  type: stacked
+  default: "no"
+  options: yes,no
+
+  "no":
+
+  "yes":
+  - name: sleap.modelname
+    label: sleap model (centroids)
+    type: file_dir
+    default: ../snakemake-workflows/sleap/models/backlight
+    help: "Path to the directory contain subdirectories with individual sleap models.\n
+          For instance one for the position (centroi)\n
+          and one for the pose (centered instance) tracking."
+- name: song
+  label: Song
+  type: stacked
+  default: "no"
+  options: "no,yes"
+
+  "no":
+
+  "yes":
+    - name: song.modelname
+      label: deepss model name
+      type: file_open
+      default: /Volumes/ukme04/#Common/snakemake-workflows/*
+    - name: song.threshold
+      label: confidence threshold
+      type: double
+      range: 0,1
+      default: 0.5
+
+- name: vibration
+  label: Vibration
+  type: stacked
+  default: "no"
+  options: "no,yes"
+
+  "no":
+
+  "yes":
+    - name: vibration.modelname
+      label: deepss model name
+      type: file_dir
+      default: /Volumes/ukme04/#Common/snakemake-workflows/*
+    - name: vibration.threshold
+      label: confidence threshold
+      type: double
+      range: 0,1
+      default: 0.5

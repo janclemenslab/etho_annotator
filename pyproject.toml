@@ -1,0 +1,14 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+dist-name = "etho_annotator"
+module = "etho_annotator"
+author = "Jan Clemens"
+author-email = "clemensjan@googlemail.com"
+home-page = "https://github.com/janclemenslab/etho_annotator"
+classifiers = ["License :: OSI Approved :: MIT License"]
+requires-python = ">=3.6"
+requires = ['numpy', 'pyqtgraph', 'pyvideoreader', 'pyside6', 'pyyaml', 'pyvideoreader', 'rich', 'qtpy']
+description-file = "README.md"

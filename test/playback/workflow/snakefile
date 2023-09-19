@@ -1,0 +1,63 @@
+include: "../../snakemake-workflows/scripts/main.smk"
+
+
+rule all:
+    input: targets['tracks'], targets['spd'], targets['sleap']
+
+rule tracks_all:
+    input: targets['tracks']
+
+rule spd_all:
+    input: targets['spd']
+
+
+rule sleap_all:
+    input: targets['sleap']
+
+rule tracks:
+    input:
+        video="dat/{directory}/{directory}.mp4",
+    params:
+        read_annotations,
+        time="36:00:00",
+        ntasks="2",
+        constraint="scratch",
+        output="{directory}_tracks.log",
+    output: "res/{directory}/{directory}_tracks.h5",
+    wrapper: "file:../snakemake-workflows/ethotracker"
+
+
+rule spd:
+    input:
+        tracks=rules.tracks.output
+    params:
+        read_annotations,
+        time="1:00:00",
+        qos="short",
+        mem="5G",
+        snd_log="dat/{directory}/{directory}_snd.log",
+        constraint="scratch",
+        output="{directory}_spd.log",
+    output: "res/{directory}/{directory}_spd.h5",
+    conda: "../../snakemake-workflows/ethotracker/environment.yaml"
+    shell: "umask g+rwx; python3 -m ethotracker.post.postprocessing {input.tracks} {params.snd_log} {output}"
+
+
+rule sleap:
+    input:
+        video="dat/{directory}/{directory}.mp4",
+    params:
+        read_annotations,
+        ntasks="2",
+        partition="gpu",
+        gpus='1',
+        constraint="scratch",
+        output="{directory}_sleap.log",
+    envmodules:
+        "cuda10.1/toolkit/10.1.105",
+        "cuda10.1/blas/10.1.105",
+        "cuda10.1/fft/10.1.105",
+        "cudnn/10.1v7.6.5",
+        "tensorrt/10.1v6.0.1.5",
+    output: "res/{directory}/{directory}_sleap.h5",
+    wrapper: "file:../snakemake-workflows/sleap"
