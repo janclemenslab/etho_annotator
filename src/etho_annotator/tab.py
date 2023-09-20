@@ -1,10 +1,11 @@
-from qtpy import QtGui, QtWidgets
+from qtpy import QtGui, QtWidgets, QtCore
 import os
 import pyqtgraph as pg
 from typing import Dict
 from . import formbuilder
 from .roi import MyEllipseROI, MyPointROI, MyRectROI, MyLedROI, geometries
 from .form import yaml, Loader
+
 
 
 class FastImageWidget(pg.GraphicsLayoutWidget):
@@ -78,7 +79,7 @@ class FlyAdder(BaseAdder):
         event.ignore()
 
     def _mouseClickEvent(self, event):
-        if event.button() == 1:
+        if event.button() == QtCore.Qt.MouseButtons.LeftButton:
             pos = (event.pos().x() - 10, event.pos().y() - 10)  # -10 to center new roi
             roi = MyPointROI(pos=pos, size=(20, 20), parent=self)
             self.addROI(roi)
@@ -96,7 +97,7 @@ class ChamberAdder(BaseAdder):
         self.rois.remove(roi)
 
     def _mouseDoubleClickEvent(self, event):
-        if event.button() == 1:
+        if event.button() == QtCore.Qt.MouseButtons.LeftButton:
             pos = (event.pos().x(), event.pos().y())  # -10 to center new roi
             idx = [radio.isChecked() for radio in self.parent.gm.radios].index(True)
             size = (200, 200)
@@ -224,11 +225,12 @@ def make_form(movie_name):
 
     # look in `workflow/analysis profiles` in the folder of the current experiment
     # also include defaults from `snakemake-workflows/analysis profiles` (at least new.yaml)
-    profiles = os.listdir(profile_dir)
+    profile_names = os.listdir(profile_dir)
 
-    for profile in profiles:
-        profile_name = profile  # os.path.splitext(profile)[0]
-        profile_path = os.path.join(profile_dir, profile)
+    for profile_name in profile_names:
+        if profile_name.startswith('.'):
+            continue
+        profile_path = os.path.join(profile_dir, profile_name)
         # append to pull down options
         items_to_create["main"][0]["options"] += "," + profile_name
         # create sub-form
@@ -238,7 +240,7 @@ def make_form(movie_name):
 
     # find a way to specify defaults for each folder - maybe instead of "None",
     # set it to a specified "analysis profiles/default.yaml" if that file exists
-    if "default.yaml" in profiles:
+    if "default.yaml" in profile_names:
         items_to_create["main"][0]["default"] = "default.yaml"
 
     form = formbuilder.DictFormWidget(form_dict=items_to_create)

@@ -1,3 +1,4 @@
+from qtpy import QtCore
 import pyqtgraph as pg
 import numpy as np
 
@@ -14,7 +15,7 @@ class ROI(pg.graphicsItems.ROI.ROI):
         self.parent.removeROI(self)
 
     def mouseClickEvent(self, event):
-        if event.button() == 2:
+        if event.button() == QtCore.Qt.MouseButtons.RightButton:
             self.remove()
             event.accept()  # accept so we remove one overlapping roi at a time
 
@@ -81,9 +82,8 @@ class MyEllipseROI(ROI, pg.graphicsItems.ROI.EllipseROI):
 
     def _addHandles(self):
         self.addRotateHandle([1.0, 0.5], [0.5, 0.5])
-        # self.addScaleHandle([0.5 * 2.0**-0.5 + 0.5, 0.5 * 2.0**-0.5 - 0.25], [0, 1])
-        # self.addScaleHandle([0.5 * 2.0**-0.5 - 0.25, 0.5 * 2.0**-0.5 + 0.5], [1, 0])
-        self.addScaleHandle([0.5 * 2.0**-0.5 + 0.5, 0.5 * 2.0**-0.5 + 0.5], [0.5, 0.5])
+        self.addScaleHandle([0.5 * 2.0**-0.5 + 0.5, 0.5 * 2.0**-0.5 - 0.25], [0, 1])
+        self.addScaleHandle([0.5 * 2.0**-0.5 - 0.25, 0.5 * 2.0**-0.5 + 0.5], [1, 0])
 
         for handle in self.handles:
             handle["item"].pen = self.handlePen
