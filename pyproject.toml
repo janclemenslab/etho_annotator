@@ -10,5 +10,5 @@ author-email = "clemensjan@googlemail.com"
 home-page = "https://github.com/janclemenslab/etho_annotator"
 classifiers = ["License :: OSI Approved :: MIT License"]
 requires-python = ">=3.6"
-requires = ['numpy', 'pyqtgraph', 'pyvideoreader', 'pyside6', 'pyyaml', 'pyvideoreader', 'rich', 'qtpy']
+requires = ['numpy', 'pyqtgraph', 'pyvideoreader', 'pyside6', 'pyyaml', 'pyvideoreader', 'rich', 'qtpy', 'defopt']
 description-file = "README.md"

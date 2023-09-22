@@ -6,9 +6,10 @@ import yaml
 import os
 from videoreader import VideoReader
 import rich
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from .tab import FlyTab, ChambersTab, make_form
 from . import form
+import defopt
 
 
 logger = logging.getLogger(__name__)
@@ -83,7 +84,7 @@ class MainWindow(QtWidgets.QMainWindow):
         data["Jobs"] = dict(form.dot_keys_to_nested(data["Jobs"]))
         rich.print(data)
 
-        filename = os.path.splitext(movie_name)[0] + "_analysis.yaml"
+        filename = os.path.splitext(self.movie_name)[0] + "_analysis.yaml"
         logging.info(f"saving to {filename}")
         with open(filename, "w") as f:
             yaml.dump(data, f)
@@ -91,7 +92,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.exit()
 
     def load(self):
-        filename = os.path.splitext(movie_name)[0] + "_analysis.yaml"
+        filename = os.path.splitext(self.movie_name)[0] + "_analysis.yaml"
         if os.path.exists(filename):
             logging.info(f"loading from {filename}")
             with open(filename, "r") as f:
@@ -106,21 +107,28 @@ class MainWindow(QtWidgets.QMainWindow):
     def exit(self):
         pg.exit()
 
+def main(movie_path: Optional[str] = None):
+    """_summary_
 
-app = QtWidgets.QApplication([])
+    Args:
+        movie_path (Optional[str]): _description_. Defaults to None.
+    """
 
-if len(sys.argv) > 1:
-    movie_name = sys.argv[1]
-else:
-    movie_name, _ = QtWidgets.QFileDialog.getOpenFileName(
-        None, "Open Video", ".", "Video Files (*.avi *.mp4)"
-    )
+    app = QtWidgets.QApplication([])
 
-vr = VideoReader(movie_name)
-frame = vr[0]
-logger.info(vr)
+    if movie_path is None:
+        movie_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            None, "Open Video", ".", "Video Files (*.avi *.mp4)"
+        )
 
-main_window = MainWindow(frame, movie_name)
-main_window.resize(frame.shape[1] // 2, frame.shape[0] // 2)
-main_window.show()
-app.exec_()
+    vr = VideoReader(movie_path)
+    frame = vr[0]
+    logger.info(vr)
+
+    main_window = MainWindow(frame, movie_path)
+    main_window.resize(frame.shape[1] // 2, frame.shape[0] // 2)
+    main_window.show()
+    app.exec_()
+
+if __name__ == "__main__":
+    defopt.run(main)
