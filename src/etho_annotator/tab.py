@@ -79,7 +79,7 @@ class FlyAdder(BaseAdder):
         event.ignore()
 
     def _mouseClickEvent(self, event):
-        if event.button() == QtCore.Qt.MouseButtons.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             pos = (event.pos().x() - 10, event.pos().y() - 10)  # -10 to center new roi
             roi = MyPointROI(pos=pos, size=(20, 20), parent=self)
             self.addROI(roi)
@@ -97,7 +97,7 @@ class ChamberAdder(BaseAdder):
         self.rois.remove(roi)
 
     def _mouseDoubleClickEvent(self, event):
-        if event.button() == QtCore.Qt.MouseButtons.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             pos = (event.pos().x(), event.pos().y())  # -10 to center new roi
             idx = [radio.isChecked() for radio in self.parent.gm.radios].index(True)
             size = (200, 200)
