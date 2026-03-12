@@ -145,9 +145,31 @@ class BaseTab(pg.GraphicsLayoutWidget):
         return d
 
     def from_dict(self, d: Dict):
-        for n in range(d["nb_rois"]):
-            roi = geometries[d["geometries"][n]](
-                d["positions"][n], d["sizes"][n], d["angles"][n], parent=self
+        nb_rois = int(d.get("nb_rois", 0))
+
+        def normalize(values, *, point: bool = False):
+            # Backward compatibility: older analysis files may store a single ROI
+            # as scalars/[x, y] instead of list entries.
+            if nb_rois == 0:
+                return []
+            if nb_rois == 1:
+                if point and isinstance(values, (list, tuple)) and len(values) == 2:
+                    if not isinstance(values[0], (list, tuple)):
+                        return [list(values)]
+                if not isinstance(values, (list, tuple)):
+                    return [values]
+                if values and not point and not isinstance(values[0], (list, tuple)):
+                    return list(values)
+            return values
+
+        positions = normalize(d.get("positions", []), point=True)
+        sizes = normalize(d.get("sizes", []), point=True)
+        angles = normalize(d.get("angles", []))
+        geoms = normalize(d.get("geometries", []))
+
+        for n in range(nb_rois):
+            roi = geometries[geoms[n]](
+                positions[n], sizes[n], angles[n], parent=self
             )
             self.mv.addROI(roi)
 

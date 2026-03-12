@@ -4,7 +4,7 @@ import pyqtgraph as pg
 import logging
 import yaml
 import os
-from videoreader import VideoReader
+import av
 import rich
 from typing import Dict, Any, Optional
 from .tab import FlyTab, ChambersTab, make_form
@@ -121,14 +121,25 @@ def main(movie_path: Optional[str] = None):
             None, "Open Video", ".", "Video Files (*.avi *.mp4)"
         )
 
-    vr = VideoReader(movie_path)
-    frame = vr[0]
-    logger.info(vr)
+    with av.open(movie_path) as container:
+        if not container.streams.video:
+            raise ValueError(f"No video stream found in {movie_path}")
+
+        frame = None
+        for decoded_frame in container.decode(video=0):
+            frame = decoded_frame.to_ndarray(format="rgb24")
+            break
+
+    if frame is None:
+        raise ValueError(f"Could not decode first frame from {movie_path}")
 
     main_window = MainWindow(frame, movie_path)
     main_window.resize(frame.shape[1] // 2, frame.shape[0] // 2)
     main_window.show()
     app.exec_()
 
-if __name__ == "__main__":
+def cli():
     defopt.run(main)
+
+if __name__ == "__main__":
+    cli()
